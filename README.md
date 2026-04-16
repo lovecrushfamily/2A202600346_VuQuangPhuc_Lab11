@@ -2,6 +2,19 @@
 
 Day 11 — Guardrails, HITL & Responsible AI: How to make agent applications safe?
 
+## Student Information
+
+- **Name:** Vu Quang Phuc
+- **Student ID:** 2A202600346
+- **Frameworks used:** Google ADK, Google Gemini, NVIDIA NeMo Guardrails
+
+## Submission Files
+
+- `notebooks/lab11_guardrails_hitl.ipynb` — completed notebook
+- `src/` — completed local Python implementation
+- `INDIVIDUAL_REPORT.md` — individual report for the assignment questions
+- `src/README.md` — local run guide for the Python project
+
 ## Objectives
 
 - Understand why guardrails are mandatory for AI products
@@ -59,8 +72,11 @@ jupyter notebook notebooks/lab11_guardrails_hitl.ipynb
 ### Local (Python modules — no Colab needed)
 
 ```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+
 cd src/
-pip install -r ../requirements.txt
 export GOOGLE_API_KEY="your-api-key-here"
 
 # Run the full lab
@@ -77,6 +93,17 @@ python guardrails/input_guardrails.py
 python guardrails/output_guardrails.py
 python testing/testing.py
 python hitl/hitl.py
+```
+
+### Quick Start
+
+```bash
+cd /path/to/2A202600346_VuQuangPhuc_Lab11
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+export GOOGLE_API_KEY="your-api-key-here"
+python src/main.py --part 2
 ```
 
 ### Tools Used
@@ -100,6 +127,13 @@ python hitl/hitl.py
 
 1. **Security Report**: Before/after comparison of 5+ attacks (ADK + NeMo)
 2. **HITL Flowchart**: 3 decision points with escalation paths
+
+## Completion Status
+
+- Notebook TODO 1 to TODO 13 completed
+- `src/` TODOs completed for attacks, input/output guardrails, NeMo, testing, and HITL
+- Individual report written in `INDIVIDUAL_REPORT.md`
+- Local project guide added in `src/README.md`
 
 ## 13 TODOs
 
@@ -128,4 +162,3 @@ python hitl/hitl.py
 - [AI Safety Fundamentals](https://aisafetyfundamentals.com/)
 - [AI Red Teaming Guide](https://github.com/requie/AI-Red-Teaming-Guide)
 - [antoan.ai - AI Safety Vietnam](https://antoan.ai)
-

@@ -10,7 +10,13 @@ from google.genai import types
 from google.adk.plugins import base_plugin
 from google.adk.agents.invocation_context import InvocationContext
 
-from core.config import ALLOWED_TOPICS, BLOCKED_TOPICS
+try:
+    from core.config import ALLOWED_TOPICS, BLOCKED_TOPICS
+except ModuleNotFoundError:
+    import sys
+    from pathlib import Path
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+    from core.config import ALLOWED_TOPICS, BLOCKED_TOPICS
 
 
 # ============================================================
@@ -38,9 +44,15 @@ def detect_injection(user_input: str) -> bool:
         True if injection detected, False otherwise
     """
     INJECTION_PATTERNS = [
-        # TODO: Add at least 5 regex patterns
-        # Example:
-        # r"ignore (all )?(previous|above) instructions",
+        r"ignore\s+(all\s+)?(previous|above)\s+instructions",
+        r"\byou are now\b",
+        r"\bsystem\s+prompt\b",
+        r"reveal\s+your\s+(instructions|prompt|config)",
+        r"pretend\s+you\s+are",
+        r"act\s+as\s+(a\s+|an\s+)?unrestricted",
+        r"(forget|bypass|override|disregard)\s+(your\s+)?(rules|instructions|safety)",
+        r"(base64|rot13|hex).*(prompt|password|api\s*key|secret)",
+        r"(bo\s+qua|b[oỏ]\s+qua).*(huong\s+dan|h[ướ]ng\s+d[ẫa]n)",
     ]
 
     for pattern in INJECTION_PATTERNS:
@@ -69,13 +81,16 @@ def topic_filter(user_input: str) -> bool:
         True if input should be BLOCKED (off-topic or blocked topic)
     """
     input_lower = user_input.lower()
+    if not input_lower.strip():
+        return True
 
-    # TODO: Implement logic:
-    # 1. If input contains any blocked topic -> return True
-    # 2. If input doesn't contain any allowed topic -> return True
-    # 3. Otherwise -> return False (allow)
+    if any(topic in input_lower for topic in BLOCKED_TOPICS):
+        return True
 
-    pass  # Replace with your implementation
+    if not any(topic in input_lower for topic in ALLOWED_TOPICS):
+        return True
+
+    return False
 
 
 # ============================================================
@@ -128,14 +143,21 @@ class InputGuardrailPlugin(base_plugin.BasePlugin):
         self.total_count += 1
         text = self._extract_text(user_message)
 
-        # TODO: Implement logic:
-        # 1. Call detect_injection(text)
-        #    - If True: increment blocked_count, return self._block_response("...")
-        # 2. Call topic_filter(text)
-        #    - If True: increment blocked_count, return self._block_response("...")
-        # 3. If both are False: return None (let message through)
+        if detect_injection(text):
+            self.blocked_count += 1
+            return self._block_response(
+                "Your request was blocked because it appears to contain prompt "
+                "injection or attempts to access hidden instructions."
+            )
 
-        pass  # Replace with your implementation
+        if topic_filter(text):
+            self.blocked_count += 1
+            return self._block_response(
+                "I can only help with VinBank banking topics such as accounts, "
+                "transactions, loans, savings, and cards."
+            )
+
+        return None
 
 
 # ============================================================
